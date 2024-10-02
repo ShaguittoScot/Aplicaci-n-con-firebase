@@ -37,11 +37,6 @@ async function buscarPorId(id) {
 
 
 async function nuevoProducto(data) {
-    /*const {salt,hash} = encriptarPass(data.password);
-    data.password = hash;
-    //console.log(data.password);
-    data.salt = salt;
-    data.tipoUsuario = "usuario"; */
     console.log(data);
 
     const producto1 = new Producto(data);
@@ -54,13 +49,6 @@ async function nuevoProducto(data) {
     return productoValido;
 }
 
-/*data = {
-    nombre: "Bethoveen",
-    usuario: "Musicoss",
-    password: "bethoven123@G"
-}*/
-
-//nuevoUsuario(data);
 
 
 async function borrarProducto(id) {

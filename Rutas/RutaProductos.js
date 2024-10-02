@@ -22,6 +22,14 @@ rutas.get("/borrarProducto/:id", async(req,res) => {
 });
 
 rutas.post("/nuevoProducto", async (req,res) => {
+    // cantidad a numero
+    if (req.body.cantidad) {
+        req.body.cantidad = parseInt(req.body.cantidad, 10);
+    }
+    // precio a numero
+    if (req.body.precio) {
+        req.body.precio = parseFloat(req.body.precio);
+    }
     var productoValido = await nuevoProducto(req.body);
     console.log(productoValido);
     res.json(productoValido);

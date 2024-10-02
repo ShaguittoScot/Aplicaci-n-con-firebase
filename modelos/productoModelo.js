@@ -12,33 +12,35 @@ class Producto {
     }
 
     set nombre(nombre) {
-        // const regexNombre = /^[A-ZÁÉÍÓÚÑ'][a-záéíóúñ']{1,}([ ][A-ZÁÉÍÓÚÑ'][a-záéíóúñ']{1,}){0,}$/;
         const regexNombre = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]+$/;
         if (regexNombre.test(nombre)) {
             this._nombre = nombre;
         }
     }
 
-
     set cantidad(cantidad) {
-        var regexCantidad = /^\d+$/;
-        if (regexCantidad.test(cantidad)) {
+        // cantidad entero positivo
+        if (Number.isInteger(cantidad) && cantidad >= 0) {
             this._cantidad = cantidad;
+        } else {
+            throw new Error("cantidad no valido ");
         }
     }
 
-   
     set precio(precio) {
-    var regexPrecio = /^\d+(\.\d{1,2})?$/;
-        if (regexPrecio.test(precio)) {
-            this._precio = precio;
+        // precio numero 2 decimales
+        if (typeof precio === 'number' && !isNaN(precio) && precio >= 0) {
+            this._precio = parseFloat(precio.toFixed(2)); // Redondea a 2 decimales
+        } else {
+            throw new Error("Precio no valido ");
         }
     }
 
-    set descripcion(descripcion){
-    var regexDescripcion = /^.{1,200}$/;
-        if (regexDescripcion.test(descripcion))
+    set descripcion(descripcion) {
+        var regexDescripcion = /^.{1,200}$/;
+        if (regexDescripcion.test(descripcion)) {
             this._descripcion = descripcion;
+        }
     }
 
     get nombre() {
@@ -46,24 +48,23 @@ class Producto {
     }
 
     get cantidad() {
-        return this._cantidad
+        return this._cantidad;
     }
-    
+
     get precio() {
         return this._precio;
     }
 
     get id() {
-        return this._id
+        return this._id;
     }
 
-    get descripcion(){
-        return this._descripcion
+    get descripcion() {
+        return this._descripcion;
     }
-    
+
     getProducto() {
-
-        const conId ={
+        const conId = {
             id: this.id,
             nombre: this.nombre,
             cantidad: this.cantidad,
@@ -76,11 +77,11 @@ class Producto {
             cantidad: this.cantidad,
             precio: this.precio,
             descripcion: this.descripcion
-        } 
+        };
 
-        if (this.id == undefined){
+        if (this.id === undefined) {
             return sinId;
-        }  else  {
+        } else {
             return conId;
         }
     }
