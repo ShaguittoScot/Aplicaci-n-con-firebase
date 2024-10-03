@@ -98,23 +98,22 @@ async function buscarCompraPorId(idVenta) {
 
 async function nuevaCompra(data) {
     const fecha = new Date();
-    console.log("Fecha generada:", fecha.toISOString().split('T')[0]); //formato YYYY-MM-DD
+    console.log("Fecha generada:", fecha);
     
     const fechaActual = fecha.toISOString().split('T')[0]; //formato YYYY-MM-DD
     const horaActual = fecha.toTimeString().split(' ')[0]; //formato HH:MM:SS
     console.log("Hora generada:", horaActual);
 
     const estado = "activa";
-    const compra1 = new Compra(data); // Asumo que Compra es una clase que ya definiste
+    const compra1 = new Compra(data);
     console.log("Compra inicial:", compra1);
     
     let compraValida = false;
     
-    // Asignamos la fecha, hora y estado a la compra
     compra1.fecha = fechaActual;
     compra1.estado = estado;
     compra1.hora = horaActual;
-    //Validar los datos de la compra
+
 
     if (validarDatosCompra(compra1.getCompra())) {
         const productoId = compra1.idProducto;
@@ -129,7 +128,7 @@ async function nuevaCompra(data) {
             await comprasBD.doc().set(compra1.getCompra());
             compraValida = true;
         } else {
-            console.log("No hay suficiente cantidad del producto o el producto no existe.");
+            console.log("No hay suficiente cantidad del producto o el producto no existe");
         }
     }
 

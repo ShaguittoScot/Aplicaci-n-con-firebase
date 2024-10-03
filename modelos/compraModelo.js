@@ -32,7 +32,6 @@ class Compra {
 
     set fecha(fecha) {
         console.log("Asignando fecha:", fecha);
-        //const date = new Date(value);
         if (fecha) {
             this._fecha = fecha;
         } else {
@@ -42,7 +41,7 @@ class Compra {
     
     set hora(hora) {
         console.log("Asignando hora:", hora);
-        //const date = new Date(value);
+
         if (hora) {
             this._hora = hora;
         } else {
@@ -55,7 +54,7 @@ class Compra {
         if (!isNaN(cantidadNumerica) && cantidadNumerica > 0) {
             this._cantidad = cantidadNumerica;
         } else {
-            throw new Error("La cantidad debe ser un número positivo.");
+            throw new Error("La cantidad debe ser un número positivo");
         }
     }
 
@@ -65,7 +64,7 @@ class Compra {
         if (estadosValidos.includes(estado)) {
             this._estado = estado;
         } else {
-            throw new Error(`El estado '${estado}' no es válido. Debe ser uno de: ${estadosValidos.join(', ')}`);
+            throw new Error(`El estado '${estado}' no es válido`);
         }
     }
 
