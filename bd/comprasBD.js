@@ -44,10 +44,11 @@ async function mostrarCompras() {
 
             // Agregar la compra con los nombres
             comprasValidas.push({
-                fecha: compra.fecha,
                 Cliente: nombreCliente,
                 Producto: nombreProducto,
                 cantidad: compra.cantidad,
+                fecha: compra.fecha,
+                hora: compra.hora,
                 estado: compra.estado
             });
         }
@@ -85,10 +86,11 @@ async function buscarCompraPorId(idVenta) {
         }
 
         compraValida.push({
-            fecha: compra1.fecha,
             Cliente: nombreCliente,
             Producto: nombreProducto,
             cantidad: compra1.cantidad,
+            fecha: compra1.fecha,
+            hora: compra1.hora,
             estado: compra1.estado
         });
     }
