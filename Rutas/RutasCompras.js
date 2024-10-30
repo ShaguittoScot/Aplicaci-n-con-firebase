@@ -1,5 +1,5 @@
 var rutas = require("express").Router();
-var { mostrarCompras, nuevaCompra, buscarCompraPorId, borrarCompra } = require("../bd/comprasBD");
+var { mostrarCompras, nuevaCompra, buscarCompraPorId, actualizarEstadoCompra } = require("../bd/comprasBD");
 
 // Ruta para mostrar todas las compras
 rutas.get("/mostrarCompras", async (req, res) => {
@@ -14,16 +14,39 @@ rutas.get("/buscarCompraPorId/:idVenta", async (req, res) => {
     res.json(compraValida);
 });
 
-// Ruta para borrar una compra por ID
-rutas.get("/borrarCompra/:idVenta", async (req, res) => {
-    var compraBorrada = await borrarCompra(req.params.idVenta);
-    res.json(compraBorrada);
+// Ruta para actualizar una compra por ID
+rutas.patch("/actualizarEstadoCompra/:idVenta/:nuevoEstado", async (req, res) => {
+    const idVenta = req.params.idVenta;
+    const nuevoEstado = req.params.nuevoEstado; // Captura el nuevo estado desde los parámetros de la ruta
+
+    // Validar si el nuevo estado es válido
+    const estadosValidos = ["activa", "cancelada", "completada"];
+    if (!estadosValidos.includes(nuevoEstado)) {
+        return res.status(400).json({ mensaje: `El estado '${nuevoEstado}' no es válido.` });
+    }
+
+    const compraActualizada = await actualizarEstadoCompra(idVenta, nuevoEstado);
+    if (!compraActualizada) {
+        return res.status(404).json({ mensaje: "Compra no encontrada o no se pudo actualizar." });
+    }
+    res.json(compraActualizada); // Devolver la compra actualizada
 });
 
+
+
 // Ruta para agregar una nueva compra
-rutas.post("/nuevaCompra", async (req, res) => {
-    var compraValida = await nuevaCompra(req.body);
-    res.json(compraValida);
+rutas.post("/nuevaCompra", async (req, res) => { 
+    try {
+        const compraValida = await nuevaCompra(req.body);
+        if (compraValida) {
+            res.status(201).json({ message: "Compra registrada con éxito" });
+        } else {
+            res.status(400).json({ message: "No se pudo registrar la compra, verifique los datos." });
+        }
+    } catch (error) {
+        console.error("Error al registrar la compra:", error);
+        res.status(500).json({ message: "Error en el servidor al procesar la compra." });
+    }
 });
 
 module.exports = rutas;

@@ -1,5 +1,5 @@
 var rutas = require("express").Router();
-var {mostrarProductos,nuevoProducto,borrarProducto,buscarPorId} = require("../bd/productosBD");
+var {mostrarProductos,nuevoProducto,borrarProducto,buscarPorId,editarProducto} = require("../bd/productosBD");
 
 
 rutas.get("/mostrarProductos",async (req,res) =>{
@@ -34,6 +34,25 @@ rutas.post("/nuevoProducto", async (req,res) => {
     console.log(productoValido);
     res.json(productoValido);
 })
+
+rutas.post("/editarProducto/:id", async (req, res) => {
+    const idProducto = req.params.id;
+
+    // Asegurarse de que la cantidad sea un número
+    if (req.body.cantidad) {
+        req.body.cantidad = parseInt(req.body.cantidad, 10);
+    }
+    // Asegurarse de que el precio sea un número
+    if (req.body.precio) {
+        req.body.precio = parseFloat(req.body.precio);
+    }
+
+    console.log("Antes de llamar a editarProducto:", req.body);
+    const resultado = await editarProducto(idProducto, req.body);
+    console.log(resultado);
+    res.json(resultado);
+});
+
 
 
 module.exports = rutas;

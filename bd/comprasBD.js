@@ -41,9 +41,8 @@ async function mostrarCompras() {
             } else {
                 nombreProducto = "Producto no encontrado";
             }
-
-            // Agregar la compra con los nombres
             comprasValidas.push({
+                IdVenta: compra.idVenta, // Asignación de IdVenta
                 Cliente: nombreCliente,
                 Producto: nombreProducto,
                 cantidad: compra.cantidad,
@@ -55,6 +54,8 @@ async function mostrarCompras() {
     }
     return comprasValidas;
 }
+
+
 
 async function buscarCompraPorId(idVenta) {
     console.log("Buscando compra ID:", idVenta);
@@ -86,6 +87,7 @@ async function buscarCompraPorId(idVenta) {
         }
 
         compraValida.push({
+            IdVenta: compra1.idVenta,
             Cliente: nombreCliente,
             Producto: nombreProducto,
             cantidad: compra1.cantidad,
@@ -102,44 +104,55 @@ async function nuevaCompra(data) {
     const fecha = new Date();
     console.log("Fecha generada:", fecha);
     
-    const fechaActual = fecha.toISOString().split('T')[0]; //formato YYYY-MM-DD
-    const horaActual = fecha.toTimeString().split(' ')[0]; //formato HH:MM:SS
+    const fechaActual = fecha.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    const horaActual = fecha.toTimeString().split(' ')[0]; // Formato HH:MM:SS
     console.log("Hora generada:", horaActual);
 
     const estado = "activa";
     const compra1 = new Compra(data);
     console.log("Compra inicial:", compra1);
     
-    let compraValida = false;
-    
     compra1.fecha = fechaActual;
     compra1.estado = estado;
     compra1.hora = horaActual;
 
-
     if (validarDatosCompra(compra1.getCompra())) {
         const productoId = compra1.idProducto;
-        const producto = await buscarProductoPorId(productoId); //Obtener producto por ID
-        //Verificar si el producto existe y si ay suficiente cantidad
+        const producto = await buscarProductoPorId(productoId); // Obtener producto por ID
+
+        // Verificar si el producto existe y si hay suficiente cantidad
         if (producto && producto.cantidad >= compra1.cantidad) {
-            //Restar la cantidad del producto
+            // Restar la cantidad del producto
             const nuevaCantidad = producto.cantidad - compra1.cantidad;
-            //Actualizar el producto
+            // Actualizar el producto
             await productosBD.doc(productoId).update({ cantidad: nuevaCantidad });
-            //Guardar la compra
+            // Guardar la compra
             await comprasBD.doc().set(compra1.getCompra());
-            compraValida = true;
+            return true; // Compra registrada con éxito
         } else {
             console.log("No hay suficiente cantidad del producto o el producto no existe");
+            return false; // No se pudo registrar la compra
         }
+    } else {
+        console.log("Datos de compra no válidos");
+        return false; // No se pudo registrar la compra
+    }
+}
+
+async function actualizarEstadoCompra(idVenta, nuevoEstado) {
+    const compra = await buscarCompraPorId(idVenta);
+
+    if (!compra) {
+        return null; // La compra no existe
     }
 
-    return compraValida;
+    // Cambiar el estado de la compra
+    await comprasBD.doc(idVenta).update({ estado: nuevoEstado });
+    return { idVenta, estado: nuevoEstado }; // Retorna información de la compra actualizada
 }
 
 
-
-async function borrarCompra(idVenta) {
+/*async function borrarCompra(idVenta) {
     const nuevoEstado = "cancelada";
     const compra = await buscarCompraPorId(idVenta);
     
@@ -151,7 +164,7 @@ async function borrarCompra(idVenta) {
         console.log("Compra no encontrada");
         return false;
     }
-}
+}*/
 
 
 
@@ -159,5 +172,5 @@ module.exports = {
     mostrarCompras,
     buscarCompraPorId,
     nuevaCompra,
-    borrarCompra
+    actualizarEstadoCompra
 }

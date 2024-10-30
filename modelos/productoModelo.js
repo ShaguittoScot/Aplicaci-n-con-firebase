@@ -11,14 +11,21 @@ class Producto {
         this._id = id;
     }
 
+    set id(id) {
+        this._id = id;
+    }
+
     set nombre(nombre) {
         const regexNombre = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]+$/;
         if (regexNombre.test(nombre)) {
             this._nombre = nombre;
+        } else {
+            throw new Error("Nombre no válido");
         }
-    }
+    }   
 
     set cantidad(cantidad) {
+        console.log("Producto cantidad:",cantidad)
         // cantidad entero positivo
         if (Number.isInteger(cantidad) && cantidad >= 0) {
             this._cantidad = cantidad;
@@ -61,6 +68,14 @@ class Producto {
 
     get descripcion() {
         return this._descripcion;
+    }
+
+
+    editarDatos(nuevosDatos) {
+        if (nuevosDatos.nombre !== undefined) this.nombre = nuevosDatos.nombre;
+        if (nuevosDatos.cantidad !== undefined) this.cantidad = nuevosDatos.cantidad;
+        if (nuevosDatos.precio !== undefined) this.precio = nuevosDatos.precio;
+        if (nuevosDatos.descripcion !== undefined) this.descripcion = nuevosDatos.descripcion;
     }
 
     getProducto() {

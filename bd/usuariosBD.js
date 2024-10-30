@@ -16,13 +16,13 @@ function validarDatos(usuario) {
 
 async function mostrarUsuarios() {
     const usuarios = await usuariosBD.get();
-    //console.log(usuarios);
+    console.log(usuarios);
     usuariosValidos = [];
     usuarios.forEach(usuario => {
         //console.log("Datos del usuario recuperados de Firestore:", usuario.data());
         const usuario1 = new Usuario({ id: usuario.id, ...usuario.data() });
         if (validarDatos(usuario1.getUsuario())) {
-            usuariosValidos.push(usuario.data());
+            usuariosValidos.push({id: usuario.id, ...usuario.data()});
         }
         //console.log("Usuarios válidos:", usuariosValidos);
     });
@@ -32,14 +32,24 @@ async function mostrarUsuarios() {
 
 
 async function buscarPorId(id) {
-    const usuario = await usuariosBD.doc(id).get();
-    const usuario1 = new Usuario({id: usuario.id, ...usuario.data()});
-    //console.log(usuario1.getUsuario());
-    var usuarioValido;
-    if (validarDatos(usuario1.getUsuario())){
-        usuarioValido = usuario1.getUsuario();
+    console.log("ID recibido:", id);
+    const usuarioDoc = await usuariosBD.doc(id).get();
+
+    // Verifica si el documento existe
+    if (!usuarioDoc.exists) {
+        console.error(`Usuario no encontrado con ID: ${id}`);
+        return null; // O lanza un error si lo prefieres
     }
-    return usuarioValido;
+
+    const usuario1 = new Usuario({ id: usuarioDoc.id, ...usuarioDoc.data() });
+
+    // Verificar si los datos del usuario son válidos
+    if (validarDatos(usuario1.getUsuario())) {
+        return usuario1.getUsuario(); // Retorna sólo si el usuario es válido
+    } else {
+        console.error(`Datos de usuario no válidos para ID: ${id}`);
+        return null; // O lanza un error si lo prefieres
+    }
 }
 
 
@@ -62,6 +72,40 @@ async function nuevoUsuario(data) {
     await usuariosBD.doc().set(datosUsuario);*/
     return usuarioValido;
 }
+
+async function editarUsuario(idUsuario, nuevosDatos) {
+    try {
+        // Primero obtén el usuario desde Firestore
+        const usuarioRef = await usuariosBD.doc(idUsuario).get();
+
+        if (!usuarioRef.exists) {
+            return { success: false, message: "Usuario no encontrado" };
+        }
+
+        const usuarioData = usuarioRef.data();
+        const usuario = new Usuario(usuarioData);
+
+        // Si el nuevo objeto incluye una contraseña, la encriptamos
+        if (nuevosDatos.password) {
+            const { salt, hash } = encriptarPass(nuevosDatos.password);
+            nuevosDatos.password = hash; // Actualizamos la contraseña con el hash encriptado
+            nuevosDatos.salt = salt;     // Guardamos el salt generado
+        }
+
+        // Editar los datos del usuario
+       usuario.editarDatos(nuevosDatos);
+
+        // Guardar los nuevos datos en Firestore
+        await usuariosBD.doc(idUsuario).update(usuario.getUsuario());
+
+        return { success: true, message: "Usuario actualizado exitosamente" };
+    } catch (error) {
+        console.error("Error al editar el usuario:", error);
+        return { success: false, message: "Error al actualizar el usuario" };
+    }
+}
+
+
 
 /*data = {
     nombre: "Bethoveen",
@@ -89,7 +133,8 @@ module.exports = {
     nuevoUsuario,
     validarDatos,
     buscarPorId,
-    borrarUsuario
+    borrarUsuario,
+    editarUsuario
 }
 
 

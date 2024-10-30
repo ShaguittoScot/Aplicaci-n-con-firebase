@@ -74,6 +74,15 @@ class Usuario {
         return this._tipoUsuario;
      }
 
+
+     editarDatos(nuevosDatos) {
+        if (nuevosDatos.nombre) this.nombre = nuevosDatos.nombre;
+        if (nuevosDatos.usuario) this.usuario = nuevosDatos.usuario;
+        if (nuevosDatos.password) this.password = nuevosDatos.password;
+        if (nuevosDatos.salt) this.salt = nuevosDatos.salt;
+        if (nuevosDatos.tipoUsuario) this.tipoUsuario = nuevosDatos.tipoUsuario;
+    }
+
     //Método opcional para obtener los datos del usuario
     getUsuario() {
         const conId = {
