@@ -1,5 +1,5 @@
 var rutas = require("express").Router();
-var { mostrarCompras, nuevaCompra, buscarCompraPorId, actualizarEstadoCompra } = require("../bd/comprasBD");
+var { mostrarCompras, nuevaCompra, buscarCompraPorId, actualizarEstadoCompra,editarCompra } = require("../bd/comprasBD");
 
 // Ruta para mostrar todas las compras
 rutas.get("/mostrarCompras", async (req, res) => {
@@ -49,4 +49,21 @@ rutas.post("/nuevaCompra", async (req, res) => {
     }
 });
 
+rutas.put("/editarCompra/:idVenta", async (req, res) => {
+    const { idVenta } = req.params;
+    const { idCliente, idProducto, cantidad } = req.body;
+
+    try {
+        const compraActualizada = await editarCompra(idVenta, { idCliente, idProducto, cantidad });
+        
+        if (!compraActualizada) {
+            return res.status(404).json({ mensaje: "Compra no encontrada o no se pudo actualizar." });
+        }
+        
+        res.json({ mensaje: "Compra actualizada con éxito", compra: compraActualizada });
+    } catch (error) {
+        console.error("Error al actualizar la compra:", error);
+        res.status(500).json({ mensaje: "Error en el servidor al actualizar la compra." });
+    }
+});
 module.exports = rutas;

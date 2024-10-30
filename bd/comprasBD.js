@@ -168,9 +168,41 @@ async function actualizarEstadoCompra(idVenta, nuevoEstado) {
 
 
 
+async function editarCompra(idVenta, datosActualizados) {
+    const compraDoc = await comprasBD.doc(idVenta).get();
+
+    if (!compraDoc.exists) {
+        throw new Error("Compra no encontrada");
+    }
+
+    const compra = new Compra({ idVenta: compraDoc.id, ...compraDoc.data() });
+    if (!validarDatosCompra(datosActualizados)) {
+        throw new Error("Datos de compra no válidos");
+    }
+    const producto = await buscarProductoPorId(datosActualizados.idProducto);
+
+    if (producto && producto.cantidad >= datosActualizados.cantidad) {
+        const cantidadDiferencia = datosActualizados.cantidad - compra.cantidad;
+        const nuevaCantidadProducto = producto.cantidad - cantidadDiferencia;
+        
+        if (nuevaCantidadProducto < 0) {
+            throw new Error("No hay suficiente cantidad del producto");
+        }
+
+        await productosBD.doc(datosActualizados.idProducto).update({ cantidad: nuevaCantidadProducto });
+        await comprasBD.doc(idVenta).update(datosActualizados);
+
+        return { idVenta, ...datosActualizados };
+    } else {
+        throw new Error("Producto no encontrado o no hay suficiente cantidad");
+    }
+}
+
 module.exports = {
     mostrarCompras,
     buscarCompraPorId,
     nuevaCompra,
-    actualizarEstadoCompra
-}
+    actualizarEstadoCompra,
+    editarCompra
+};
+
