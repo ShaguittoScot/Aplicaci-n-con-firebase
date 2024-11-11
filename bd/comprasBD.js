@@ -58,7 +58,7 @@ async function mostrarCompras() {
 
 
 async function buscarCompraPorId(idVenta) {
-    console.log("Buscando compra ID:", idVenta);
+    //console.log("Buscando compra ID:", idVenta);
     const compraDoc = await comprasBD.doc(idVenta).get();
     if (!compraDoc.exists) {
         throw new Error("Compra no encontrada");
@@ -93,7 +93,9 @@ async function buscarCompraPorId(idVenta) {
             cantidad: compra1.cantidad,
             fecha: compra1.fecha,
             hora: compra1.hora,
-            estado: compra1.estado
+            estado: compra1.estado,
+            idCliente: compra1.idCliente,
+            idProducto: compra1.idProducto
         });
     }
 

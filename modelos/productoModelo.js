@@ -25,7 +25,7 @@ class Producto {
     }   
 
     set cantidad(cantidad) {
-        console.log("Producto cantidad:",cantidad)
+        //console.log("Producto cantidad:",cantidad)
         // cantidad entero positivo
         if (Number.isInteger(cantidad) && cantidad >= 0) {
             this._cantidad = cantidad;

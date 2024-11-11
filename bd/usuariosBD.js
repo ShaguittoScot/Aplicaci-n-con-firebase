@@ -1,5 +1,5 @@
 const usuariosBD = require("./conexion").usuarios;
-const { encriptarPass } = require("../midleware/funcPass");
+const { encriptarPass, validarPass } = require("../midleware/funcPass");
 const Usuario = require("../modelos/usuarioModelo")
 //console.log(usuariosBD);
 
@@ -32,7 +32,7 @@ async function mostrarUsuarios() {
 
 
 async function buscarPorId(id) {
-    console.log("ID recibido:", id);
+    //console.log("ID recibido:", id);
     const usuarioDoc = await usuariosBD.doc(id).get();
 
     // Verifica si el documento existe
@@ -128,13 +128,44 @@ async function borrarUsuario(id) {
 }
 
 
+async function login(usuario, password) {
+    let user = "anonimo";
+    let role = "guest"; // Asignación por defecto del rol
+
+    try {
+        const usuariosCorrectos = await usuariosBD.where("usuario", "==", usuario).get();
+        usuariosCorrectos.forEach((usu) => {
+            const usuarioData = usu.data();
+            const usuarioCorrecto = validarPass(password, usuarioData.password, usuarioData.salt);
+            
+            if (usuarioCorrecto) {
+                user = usuarioData.usuario;
+                
+                // Verificación del rol
+                if (usuarioData.role === "admin") {
+                    role = "admin";
+                } else if (usuarioData.role === "user") {
+                    role = "user";
+                }
+                // Puedes agregar más roles según tus necesidades
+            }
+        });
+    } catch (error) {
+        console.error("Error en la consulta de usuarios:", error);
+    }
+
+    return { user, role };
+}
+
+
 module.exports = {
     mostrarUsuarios,
     nuevoUsuario,
     validarDatos,
     buscarPorId,
     borrarUsuario,
-    editarUsuario
+    editarUsuario,
+    login
 }
 
 

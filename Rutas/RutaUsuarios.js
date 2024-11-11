@@ -1,5 +1,6 @@
 var rutas = require("express").Router();
-var {mostrarUsuarios,nuevoUsuario,validarDatos,borrarUsuario,mostrarUsuarios,buscarPorId,editarUsuario} = require("../bd/usuariosBD");
+const { usuarios } = require("../bd/conexion");
+var {mostrarUsuarios,nuevoUsuario,validarDatos,borrarUsuario,mostrarUsuarios,buscarPorId,editarUsuario,login} = require("../bd/usuariosBD");
 const {encriptarPass,validarPass,usuarioAutorizado,adminAutorizado} = require("../midleware/funcPass")
 
 
@@ -11,7 +12,7 @@ rutas.get("/",async (req,res) =>{
 });
 
 rutas.get("/buscarUsuarioPorId/:id", async(req,res) => {
-    console.log("id recibido:",req.params.id)
+    //console.log("id recibido:",req.params.id)
     var usuarioValido = await buscarPorId(req.params.id)
     //console.log (usuarioValido);
     res.json(usuarioValido);
@@ -41,6 +42,25 @@ rutas.put("/editarUsuario/:id", async (req, res) => {
         res.status(400).json(resultado);
     }
 });
+
+rutas.post('/login', async (req, res) => {
+    const { usuario, password } = req.body; // Extraemos usuario y contraseña del cuerpo de la solicitud
+
+    try {
+        const usuarioValido = await login(usuario, password);
+        
+        if (usuarioValido) {
+            res.status(200).json({ message: "Inicio de sesión exitoso", usuario: usuarioValido });
+        } else {
+            res.status(401).json({ message: "Credenciales incorrectas" });
+        }
+    } catch (error) {
+        console.error("Error en el inicio de sesión:", error);
+        res.status(500).json({ message: "Error en el servidor" });
+    }
+});
+
+
 
 
 module.exports = rutas;
